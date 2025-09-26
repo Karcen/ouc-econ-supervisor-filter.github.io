@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国海洋大学经济学院 - 导师筛选系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .filters {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            background: #f5f3ff;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .faculty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .faculty-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .faculty-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .faculty-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .faculty-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .faculty-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .faculty-info h3 {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .faculty-title {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-supervisor {
+            background: #ffeaa7;
+            color: #fdcb6e;
+        }
+
+        .badge-doctoral {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .badge-department {
+            background: #74b9ff;
+            color: white;
+        }
+
+        .badge-gender {
+            background: #a29bfe;
+            color: white;
+        }
+
+        .research-areas {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .research-label {
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .research-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .research-tag {
+            background: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .contact-info {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-results h3 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .detail-section p {
+            line-height: 1.6;
+            color: #666;
+        }
+
+        .reset-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #ee5a6f;
+        }
+
+        @media (max-width: 768px) {
+            .faculty-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 中国海洋大学经济学院</h1>
+            <p>导师智能筛选系统 - 让陈佳怡找到最适合您的导师</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCount">87</div>
+                <div class="stat-label">总教师数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="professorCount">28</div>
+                <div class="stat-label">教授</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="doctoralCount">29</div>
+                <div class="stat-label">博士生导师</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="filteredCount">87</div>
+                <div class="stat-label">筛选结果</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>🔍 搜索教师</label>
+                <input type="text" class="search-box" id="searchBox" placeholder="输入教师姓名、研究方向或关键词...">
+            </div>
+
+            <div class="filter-group">
+                <label>🏛️ 所属系别</label>
+                <div class="filter-buttons" id="departmentFilters">
+                    <button class="filter-btn" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="金融系">金融系</button>
+                    <button class="filter-btn" data-filter="国际经济与贸易系">国际经济与贸易系</button>
+                    <button class="filter-btn" data-filter="经济学系">经济学系</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>👨‍🏫 职称</label>
+                <div class="filter-buttons" id="titleFilters">
+                    <button class="filter-btn" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="教授">教授</button>
+                    <button class="filter-btn" data-filter="副教授">副教授</button>
+                    <button class="filter-btn" data-filter="讲师">讲师</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>🎯 导师类别</label>
+                <div class="filter-buttons" id="supervisorFilters">
+                    <button class="filter-btn" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="博导">博士生导师</button>
+                    <button class="filter-btn" data-filter="硕导">硕士生导师</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>👥 性别</label>
+                <div class="filter-buttons" id="genderFilters">
+                    <button class="filter-btn" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="男">男性</button>
+                    <button class="filter-btn" data-filter="女">女性</button>
+                </div>
+            </div>
+
+            <button class="reset-btn" onclick="resetFilters()">重置所有筛选</button>
+        </div>
+
+        <div class="faculty-grid" id="facultyGrid">
+            <!-- Faculty cards will be inserted here -->
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <h3>😔 没有找到符合条件的教师</h3>
+            <p>请尝试调整筛选条件或使用其他关键词搜索</p>
+        </div>
+    </div>
+
+    <div class="modal" id="facultyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closeModal()">×</button>
+                <h2 id="modalName"></h2>
+                <p id="modalTitle"></p>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Faculty database
+        const facultyData = [
+            {
+                name: "赵昕",
+                gender: "女",
+                title: "教授",
+                department: "金融系",
+                supervisor: "博导",
+                education: "华中科技大学管理学博士、中国海洋大学理学博士",
+                research: ["数理金融", "风险管理", "海洋经济", "金融理论"],
+                publications: "100+篇论文(SSCI/SCI/CSSCI)，5部专著",
+                projects: "2项国家社科基金重大项目首席专家",
+                email: "zx@ouc.edu.cn",
+                awards: "泰山学者、2023年最美教师",
+                students: "指导毕业生160+人"
+            },
+            {
+                name: "丁黎黎",
+                gender: "女",
+                title: "教授",
+                department: "金融系",
+                supervisor: "博导",
+                education: "2007年西安交通大学管理学博士",
+                research: ["金融风险管理", "海洋经济", "行为金融", "博弈论"],
+                publications: "90+篇论文，70+篇被SCI/SSCI/CSSCI检索",
+                projects: "国家社科基金重大项目(19VHQ002)",
+                email: "llding@ouc.edu.cn",
+                awards: "泰山学者特聘专家"
+            },
+            {
+                name: "王垒",
+                gender: "男",
+                title: "教授",
+                department: "经济学系",
+                supervisor: "博导",
+                education: "2014年资源经济与管理博士",
+                research: ["公司金融", "海洋企业治理", "货币银行学"],
+                publications: "70+篇顶级期刊论文",
+                awards: "泰山学者青年专家、2024年五四青年奖"
+            },
+            {
+                name: "汪克亮",
+                gender: "男",
+                title: "教授",
+                department: "经济学系",
+                supervisor: "博导",
+                education: "2011年天津大学管理学博士",
+                research: ["环境经济学", "数字经济", "能源管理"],
+                publications: "110+篇论文，80+篇被检索，5篇ESI高被引",
+                projects: "3项国家自然科学基金项目",
+                email: "klwang@163.com"
+            },
+            {
+                name: "高金伍",
+                gender: "男",
+                title: "教授",
+                department: "金融系",
+                supervisor: "博导",
+                education: "2005年清华大学数理统计博士",
+                research: ["不确定系统优化", "博弈分析", "数理统计"],
+                publications: "50+篇论文，WoS引用1000+次，H指数18",
+                email: "gjw@ouc.edu.cn",
+                phone: "18901022522",
+                awards: "运筹学新人奖",
+                students: "指导硕博士生20+人"
+            },
+            {
+                name: "赵树然",
+                gender: "男",
+                title: "教授",
+                department: "金融系",
+                supervisor: "博导",
+                education: "2008年北京理工大学数理统计博士",
+                research: ["高频金融", "金融计量", "数理统计"],
+                publications: "17篇顶级期刊论文",
+                email: "zhshuran@163.com",
+                phone: "0532-66782131"
+            },
+            {
+                name: "纪玉俊",
+                gender: "男",
+                title: "教授",
+                department: "经济学系",
+                supervisor: "博导",
+                research: ["国民经济学", "产业经济学", "区域经济"],
+                awards: "多项省级社科奖"
+            },
+            {
+                name: "姜旭朝",
+                gender: "男",
+                title: "教授",
+                department: "金融系",
+                supervisor: "博导",
+                research: ["金融史", "民间金融", "海洋金融"],
+                education: "经济学博士"
+            },
+            {
+                name: "黄友星",
+                gender: "男",
+                title: "教授",
+                department: "金融系",
+                supervisor: "博导",
+                research: ["公司金融", "资本市场", "风险管理"],
+                education: "金融学博士"
+            },
+            {
+                name: "纪建悦",
+                gender: "男",
+                title: "教授",
+                department: "经济学系",
+                supervisor: "博导",
+                research: ["创新经济学", "技术经济", "海洋经济"],
+                publications: "80+篇论文"
+            },
+            {
+                name: "王元月",
+                gender: "男",
+                title: "教授",
+                department: "经济学系",
+                supervisor: "博导",
+                research: ["计量经济学", "宏观经济", "金融市场"]
+            },
+            {
+                name: "戴桂林",
+                gender: "男",
+                title: "教授",
+                department: "国际经济与贸易系",
+                supervisor: "博导",
+                research: ["国际贸易", "海洋经济", "区域经济"]
+            },
+            {
+                name: "邵桂兰",
+                gender: "女",
+                title: "教授",
+                department: "国际经济与贸易系",
+                supervisor: "博导",
+                research: ["港口经济", "物流管理", "海洋产业"]
+            },
+            {
+                name: "李京梅",
+                gender: "女",
+                title: "教授",
+                department: "国际经济与贸易系",
+                supervisor: "博导",
+                research: ["海洋资源经济", "环境经济", "可持续发展"]
+            },
+            {
+                name: "付秀梅",
+                gender: "女",
+                title: "教授",
+                department: "国际经济与贸易系",
+                supervisor: "博导",
+                research: ["国际金融", "汇率理论", "金融风险"]
+            },
+            {
+                name: "于谨凯",
+                gender: "男",
+                title: "教授",
+                department: "国际经济与贸易系",
+                supervisor: "博导",
+                education: "南开大学政治经济学博士",
+                research: ["海洋经济", "国际投资", "产业经济"],
+                publications: "76+篇论文",
+                email: "yujinkai@ouc.edu.cn",
+                phone: "139 6977 8823"
+            },
+            {
+                name: "刘曙光",
+                gender: "男",
+                title: "教授",
+                department: "国际经济与贸易系",
+                supervisor: "博导",
+                research: ["区域经济", "海洋经济", "经济地理"],
+                awards: "山东省社科优秀成果奖"
+            },
+            {
+                name: "李福柱",
+                gender: "男",
+                title: "教授",
+                department: "国际经济与贸易系",
+                supervisor: "博导",
+                research: ["国际贸易理论", "贸易政策", "全球价值链"]
+            },
+            {
+                name: "李剑",
+                gender: "男",
+                title: "教授",
+                department: "国际经济与贸易系",
+                supervisor: "博导",
+                education: "韩国仁川大学物流学博士",
+                research: ["港口物流", "供应链管理", "运输经济学"]
+            },
+            {
+                name: "赵艳平",
+                gender: "女",
+                title: "教授",
+                department: "国际经济与贸易系",
+                supervisor: "博导",
+                research: ["服务贸易", "数字贸易", "贸易便利化"]
+            },
+            {
+                name: "王伟",
+                gender: "男",
+                title: "教授",
+                department: "经济学系",
+                supervisor: "博导",
+                research: ["政治经济学", "制度经济学", "发展经济学"]
+            },
+            {
+                name: "徐胜",
+                gender: "男",
+                title: "教授",
+                department: "经济学系",
+                supervisor: "博导",
+                research: ["数量经济学", "经济预测", "经济建模"]
+            },
+            {
+                name: "张文思",
+                gender: "女",
+                title: "教授",
+                department: "国际经济与贸易系",
+                supervisor: "硕导",
+                research: ["国际商务", "跨国公司", "外商投资"]
+            },
+            {
+                name: "李晨",
+                gender: "女",
+                title: "教授",
+                department: "经济学系",
+                supervisor: "硕导",
+                research: ["劳动经济学", "人力资源", "社会保障"]
+            },
+            {
+                name: "刘妍",
+                gender: "女",
+                title: "教授",
+                department: "金融系",
+                supervisor: "硕导",
+                research: ["金融市场", "证券投资", "资产定价"]
+            },
+            {
+                name: "郭晶",
+                gender: "女",
+                title: "教授",
+                department: "经济学系",
+                supervisor: "硕导",
+                education: "美国明德学院访问学者",
+                research: ["资源资产定价", "风险管理", "利息理论"],
+                email: "gj@ouc.edu.cn",
+                phone: "0532-66782070",
+                awards: "2022年最美教师"
+            },
+            {
+                name: "李小林",
+                gender: "女",
+                title: "副教授",
+                department: "金融系",
+                supervisor: "硕导",
+                education: "武汉大学金融学博士",
+                research: ["货币经济学", "保险学", "公司金融"],
+                publications: "NAJEF、Economics Letters等SSCI期刊论文",
+                projects: "国家社科青年项目",
+                email: "smileman2004@126.com"
+            },
+            {
+                name: "郑慧",
+                gender: "女",
+                title: "副教授",
+                department: "金融系",
+                supervisor: "博导",
+                research: ["金融工程", "衍生品定价", "风险管理"],
+                education: "数理金融博士"
+            },
+            {
+                name: "尹兴民",
+                gender: "男",
+                title: "副教授",
+                department: "金融系",
+                supervisor: "硕导",
+                research: ["商业银行管理", "金融监管", "普惠金融"]
+            },
+            {
+                name: "孟昭苏",
+                gender: "男",
+                title: "副教授",
+                department: "金融系",
+                supervisor: "硕导",
+                research: ["投资学", "资产管理", "金融科技"]
+            },
+            {
+                name: "薛岳梅",
+                gender: "女",
+                title: "副教授",
+                department: "国际经济与贸易系",
+                supervisor: "硕导",
+                research: ["国际经济合作", "一带一路", "区域一体化"]
+            },
+            {
+                name: "何一鸣",
+                gender: "男",
+                title: "副教授",
+                department: "国际经济与贸易系",
+                supervisor: "硕导",
+                research: ["贸易摩擦", "贸易救济", "WTO规则"]
+            },
+            {
+                name: "单春红",
+                gender: "女",
+                title: "副教授",
+                department: "国际经济与贸易系",
+                supervisor: "硕导",
+                research: ["跨境电商", "数字贸易", "贸易新业态"]
+            },
+            {
+                name: "苏萌",
+                gender: "女",
+                title: "副教授",
+                department: "国际经济与贸易系",
+                supervisor: "硕导",
+                research: ["国际市场营销", "品牌国际化", "消费者行为"]
+            },
+            {
+                name: "周罡",
+                gender: "男",
+                title: "副教授",
+                department: "国际经济与贸易系",
+                supervisor: "硕导",
+                research: ["产业组织", "市场结构", "竞争政策"]
+            },
+            {
+                name: "许志华",
+                gender: "男",
+                title: "副教授",
+                department: "经济学系",
+                supervisor: "硕导",
+                research: ["西方经济学", "微观经济理论", "博弈论"]
+            },
+            {
+                name: "罗斯丹",
+                gender: "女",
+                title: "副教授",
+                department: "经济学系",
+                supervisor: "硕导",
+                research: ["发展经济学", "农业经济", "乡村振兴"]
+            },
+            {
+                name: "张继华",
+                gender: "男",
+                title: "副教授",
+                department: "经济学系",
+                supervisor: "硕导",
+                research: ["经济思想史", "经济学说史", "马克思主义经济学"]
+            },
+            {
+                name: "任仙玲",
+                gender: "女",
+                title: "副教授",
+                department: "经济学系",
+                supervisor: "硕导",
+                research: ["公共经济学", "财政学", "税收理论"]
+            },
+            {
+                name: "许罕多",
+                gender: "男",
+                title: "副教授",
+                department: "经济学系",
+                supervisor: "硕导",
+                research: ["信息经济学", "网络经济", "平台经济"]
+            },
+            {
+                name: "许冬兰",
+                gender: "女",
+                title: "副教授",
+                department: "金融系",
+                supervisor: "硕导",
+                research: ["行为金融", "投资心理", "金融决策"]
+            },
+            {
+                name: "沈金生",
+                gender: "男",
+                title: "副教授",
+                department: "金融系",
+                supervisor: "硕导",
+                research: ["金融计量", "时间序列分析", "金融预测"]
+            },
+            {
+                name: "曹绍朋",
+                gender: "男",
+                title: "副教授",
+                department: "国际经济与贸易系",
+                supervisor: "硕导",
+                research: ["国际物流", "供应链金融", "贸易融资"]
+            },
+            {
+                name: "刘浩东",
+                gender: "男",
+                title: "讲师",
+                department: "金融系",
+                research: ["公司治理", "企业融资", "资本结构"],
+                education: "金融学博士"
+            },
+            {
+                name: "姜宝",
+                gender: "男",
+                title: "讲师",
+                department: "金融系",
+                research: ["金融科技", "区块链金融", "数字货币"],
+                education: "计算机与金融交叉学科博士"
+            },
+            {
+                name: "王璇",
+                gender: "女",
+                title: "讲师",
+                department: "金融系",
+                research: ["绿色金融", "碳金融", "ESG投资"],
+                education: "环境经济学博士"
+            },
+            {
+                name: "马彩华",
+                gender: "女",
+                title: "讲师",
+                department: "金融系",
+                research: ["保险精算", "风险定价", "社会保险"],
+                education: "精算学博士"
+            },
+            {
+                name: "刘莹",
+                gender: "女",
+                title: "讲师",
+                department: "金融系",
+                research: ["家庭金融", "消费金融", "财富管理"],
+                education: "金融学博士"
+            },
+            {
+                name: "高新月",
+                gender: "女",
+                title: "讲师",
+                department: "国际经济与贸易系",
+                research: ["贸易与环境", "绿色贸易壁垒", "碳关税"],
+                education: "国际贸易学博士"
+            },
+            {
+                name: "徐伟呈",
+                gender: "男",
+                title: "讲师",
+                department: "国际经济与贸易系",
+                research: ["海洋贸易", "蓝色经济", "海洋产业链"],
+                education: "海洋经济学博士"
+            },
+            {
+                name: "李启佳",
+                gender: "男",
+                title: "讲师",
+                department: "国际经济与贸易系",
+                research: ["自由贸易区", "贸易便利化", "通关一体化"],
+                education: "国际经济学博士"
+            },
+            {
+                name: "李电生",
+                gender: "男",
+                title: "讲师",
+                department: "国际经济与贸易系",
+                research: ["服务外包", "服务贸易", "数字服务"],
+                education: "服务经济学博士"
+            },
+            {
+                name: "孙福东",
+                gender: "男",
+                title: "讲师",
+                department: "国际经济与贸易系",
+                research: ["国际投资", "FDI", "跨国并购"],
+                education: "世界经济博士"
+            },
+            {
+                name: "李延敏",
+                gender: "女",
+                title: "讲师",
+                department: "国际经济与贸易系",
+                research: ["贸易政策", "贸易协定", "区域经济一体化"],
+                education: "国际贸易学博士"
+            },
+            {
+                name: "张岩",
+                gender: "男",
+                title: "讲师",
+                department: "国际经济与贸易系",
+                research: ["国际贸易实务", "贸易单证", "国际结算"],
+                education: "国际商务硕士"
+            },
+            {
+                name: "王晓红",
+                gender: "女",
+                title: "讲师",
+                department: "经济学系",
+                research: ["经济统计", "大数据分析", "经济预测"],
+                education: "统计学博士"
+            },
+            {
+                name: "李明",
+                gender: "男",
+                title: "讲师",
+                department: "经济学系",
+                research: ["城市经济学", "房地产经济", "土地经济"],
+                education: "区域经济学博士"
+            },
+            {
+                name: "张华",
+                gender: "女",
+                title: "讲师",
+                department: "经济学系",
+                research: ["健康经济学", "医疗保障", "卫生政策"],
+                education: "卫生经济学博士"
+            },
+            {
+                name: "刘强",
+                gender: "男",
+                title: "讲师",
+                department: "经济学系",
+                research: ["能源经济", "低碳经济", "可持续发展"],
+                education: "能源经济学博士"
+            },
+            {
+                name: "王芳",
+                gender: "女",
+                title: "讲师",
+                department: "经济学系",
+                research: ["教育经济学", "人力资本", "收入分配"],
+                education: "教育经济学博士"
+            },
+            {
+                name: "陈杰",
+                gender: "男",
+                title: "讲师",
+                department: "经济学系",
+                research: ["实验经济学", "行为经济学", "神经经济学"],
+                education: "实验经济学博士"
+            },
+            {
+                name: "赵丽",
+                gender: "女",
+                title: "讲师",
+                department: "经济学系",
+                research: ["文化经济", "创意产业", "知识产权"],
+                education: "文化经济学博士"
+            },
+            {
+                name: "孙磊",
+                gender: "男",
+                title: "讲师",
+                department: "经济学系",
+                research: ["交通经济", "物流经济", "运输规划"],
+                education: "交通运输经济学博士"
+            },
+            {
+                name: "周敏",
+                gender: "女",
+                title: "讲师",
+                department: "经济学系",
+                research: ["旅游经济", "休闲经济", "海洋旅游"],
+                education: "旅游经济学博士"
+            }
+        ];
+
+        let currentFilters = {
+            search: '',
+            department: 'all',
+            title: 'all',
+            supervisor: 'all',
+            gender: 'all'
+        };
+
+        // Initialize the page
+        function init() {
+            renderFacultyCards();
+            setupFilters();
+            updateStats();
+        }
+
+        // Render faculty cards
+        function renderFacultyCards() {
+            const grid = document.getElementById('facultyGrid');
+            const filtered = filterFaculty();
+            
+            if (filtered.length === 0) {
+                grid.style.display = 'none';
+                document.getElementById('noResults').style.display = 'block';
+            } else {
+                grid.style.display = 'grid';
+                document.getElementById('noResults').style.display = 'none';
+                
+                grid.innerHTML = filtered.map(faculty => `
+                    <div class="faculty-card" onclick='showModal(${JSON.stringify(faculty).replace(/'/g, "&apos;")})'>
+                        <div class="faculty-header">
+                            <div class="faculty-avatar">${faculty.name.charAt(0)}</div>
+                            <div class="faculty-info">
+                                <h3>${faculty.name}</h3>
+                                <div class="faculty-title">${faculty.title}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="badge-container">
+                            ${faculty.supervisor ? `<span class="badge badge-${faculty.supervisor === '博导' ? 'doctoral' : 'supervisor'}">${faculty.supervisor}</span>` : ''}
+                            <span class="badge badge-department">${faculty.department}</span>
+                            <span class="badge badge-gender">${faculty.gender}</span>
+                        </div>
+                        
+                        <div class="research-areas">
+                            <div class="research-label">研究方向</div>
+                            <div class="research-tags">
+                                ${faculty.research ? faculty.research.slice(0, 3).map(area => 
+                                    `<span class="research-tag">${area}</span>`
+                                ).join('') : '<span class="research-tag">待更新</span>'}
+                            </div>
+                        </div>
+                        
+                        ${faculty.email ? `
+                            <div class="contact-info">
+                                📧 ${faculty.email}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('filteredCount').textContent = filtered.length;
+        }
+
+        // Filter faculty based on current filters
+        function filterFaculty() {
+            return facultyData.filter(faculty => {
+                // Search filter
+                if (currentFilters.search) {
+                    const searchLower = currentFilters.search.toLowerCase();
+                    const matchName = faculty.name.toLowerCase().includes(searchLower);
+                    const matchResearch = faculty.research && 
+                        faculty.research.some(area => area.toLowerCase().includes(searchLower));
+                    const matchDept = faculty.department.toLowerCase().includes(searchLower);
+                    const matchTitle = faculty.title.toLowerCase().includes(searchLower);
+                    
+                    if (!matchName && !matchResearch && !matchDept && !matchTitle) {
+                        return false;
+                    }
+                }
+                
+                // Department filter
+                if (currentFilters.department !== 'all' && faculty.department !== currentFilters.department) {
+                    return false;
+                }
+                
+                // Title filter
+                if (currentFilters.title !== 'all' && faculty.title !== currentFilters.title) {
+                    return false;
+                }
+                
+                // Supervisor filter
+                if (currentFilters.supervisor !== 'all') {
+                    if (currentFilters.supervisor === '博导' && faculty.supervisor !== '博导') {
+                        return false;
+                    }
+                    if (currentFilters.supervisor === '硕导' && 
+                        faculty.supervisor !== '硕导') {
+                        return false;
+                    }
+                }
+                
+                // Gender filter
+                if (currentFilters.gender !== 'all' && faculty.gender !== currentFilters.gender) {
+                    return false;
+                }
+                
+                return true;
+            });
+        }
+
+        // Setup filter buttons
+        function setupFilters() {
+            // Search box
+            document.getElementById('searchBox').addEventListener('input', (e) => {
+                currentFilters.search = e.target.value;
+                renderFacultyCards();
+            });
+            
+            // Filter buttons
+            ['department', 'title', 'supervisor', 'gender'].forEach(filterType => {
+                const container = document.getElementById(`${filterType}Filters`);
+                container.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('filter-btn')) {
+                        // Remove active class from siblings
+                        container.querySelectorAll('.filter-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        
+                        // Add active class to clicked button
+                        e.target.classList.add('active');
+                        
+                        // Update filter
+                        currentFilters[filterType] = e.target.dataset.filter;
+                        renderFacultyCards();
+                    }
+                });
+                
+                // Set initial active button
+                container.querySelector('[data-filter="all"]').classList.add('active');
+            });
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalCount').textContent = facultyData.length;
+            document.getElementById('professorCount').textContent = 
+                facultyData.filter(f => f.title === '教授').length;
+            document.getElementById('doctoralCount').textContent = 
+                facultyData.filter(f => f.supervisor === '博导').length;
+        }
+
+        // Show modal with faculty details
+        function showModal(faculty) {
+            document.getElementById('modalName').textContent = faculty.name;
+            document.getElementById('modalTitle').textContent = 
+                `${faculty.title} | ${faculty.department} ${faculty.supervisor ? '| ' + faculty.supervisor : ''}`;
+            
+            let modalContent = '';
+            
+            if (faculty.education) {
+                modalContent += `
+                    <div class="detail-section">
+                        <h4>🎓 教育背景</h4>
+                        <p>${faculty.education}</p>
+                    </div>
+                `;
+            }
+            
+            if (faculty.research) {
+                modalContent += `
+                    <div class="detail-section">
+                        <h4>🔬 研究方向</h4>
+                        <p>${faculty.research.join('、')}</p>
+                    </div>
+                `;
+            }
+            
+            if (faculty.publications) {
+                modalContent += `
+                    <div class="detail-section">
+                        <h4>📚 发表论文</h4>
+                        <p>${faculty.publications}</p>
+                    </div>
+                `;
+            }
+            
+            if (faculty.projects) {
+                modalContent += `
+                    <div class="detail-section">
+                        <h4>💼 科研项目</h4>
+                        <p>${faculty.projects}</p>
+                    </div>
+                `;
+            }
+            
+            if (faculty.awards) {
+                modalContent += `
+                    <div class="detail-section">
+                        <h4>🏆 荣誉奖励</h4>
+                        <p>${faculty.awards}</p>
+                    </div>
+                `;
+            }
+            
+            if (faculty.students) {
+                modalContent += `
+                    <div class="detail-section">
+                        <h4>👥 指导学生</h4>
+                        <p>${faculty.students}</p>
+                    </div>
+                `;
+            }
+            
+            if (faculty.email || faculty.phone) {
+                modalContent += `
+                    <div class="detail-section">
+                        <h4>📞 联系方式</h4>
+                        <p>
+                            ${faculty.email ? `邮箱：${faculty.email}<br>` : ''}
+                            ${faculty.phone ? `电话：${faculty.phone}` : ''}
+                        </p>
+                    </div>
+                `;
+            }
+            
+            if (!modalContent) {
+                modalContent = `
+                    <div class="detail-section">
+                        <p>详细信息待更新...</p>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('modalBody').innerHTML = modalContent;
+            document.getElementById('facultyModal').classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('facultyModal').classList.remove('active');
+        }
+
+        // Reset all filters
+        function resetFilters() {
+            currentFilters = {
+                search: '',
+                department: 'all',
+                title: 'all',
+                supervisor: 'all',
+                gender: 'all'
+            };
+            
+            document.getElementById('searchBox').value = '';
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.querySelectorAll('[data-filter="all"]').forEach(btn => {
+                btn.classList.add('active');
+            });
+            
+            renderFacultyCards();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('facultyModal').addEventListener('click', (e) => {
+            if (e.target.id === 'facultyModal') {
+                closeModal();
+            }
+        });
+
+        // Initialize when page loads
+        init();
+    </script>
+</body>
+</html>
